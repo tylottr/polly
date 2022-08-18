@@ -1,0 +1,95 @@
+######################################################
+# Docker Build Workflow
+#
+# Builds a Docker image and pushes it to a repository
+# with three tags:
+# - latest
+# - branch name
+# - branch name + run id
+# 
+# See https://github.com/docker/login-action for
+# documentation on the login step.
+######################################################
+
+name: Docker Build
+
+# set global permissions
+permissions:
+  contents: read
+  checks: write
+
+# set global pipeline env vars
+env:
+  imageName: tylottr/polly
+  registryUser: tylottr
+  registryPass: ${{ secrets.REGISTRY_PASS }}
+  nodeVersion: 18.x
+
+# workflow triggers
+on:
+  # enables manual runs
+  workflow_dispatch:
+  # on push to main or any tag
+  push:
+    branches: [main]
+    tags: ["*"]
+    # ignore path globs
+    paths-ignore:
+      - "**/README.md"
+      - "**/.gitignore"
+      - "**/.github/**"
+      - "**/manifests/**"
+
+# workflow
+jobs:
+  # perform linting and upload results
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3.0.0
+        with:
+          node-version: ${{ env.nodeVersion }}
+      - name: Run Linter
+        run: npm ci; npm run lint:ci
+      - uses: dorny/test-reporter@v1.5.0
+        with:
+          name: Linting Results
+          reporter: java-junit
+          path: lint.xml
+
+  # perform unit test and upload results
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3.0.0
+        with:
+          node-version: ${{ env.nodeVersion }}
+      - name: Run Unit Test
+        run: npm ci; npm run test:ci
+      - uses: dorny/test-reporter@v1.5.0
+        with:
+          name: Unit Test Results
+          reporter: java-junit
+          path: test-results.xml
+
+  # run build and upload image
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    needs: [lint, unit]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ env.registryUser }}
+          password: ${{ env.registryPass }}
+      - name: Build and Push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          tags: |
+            ${{ env.imageName }}:latest
+            ${{ env.imageName }}:${{ github.ref_name }}
+          push: true

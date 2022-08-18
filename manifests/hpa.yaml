@@ -1,0 +1,15 @@
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: polly
+  labels:
+    app.kubernetes.io/name: polly
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: polly
+  minReplicas: 3
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50

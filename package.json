@@ -1,0 +1,31 @@
+{
+  "name": "polly",
+  "version": "1.0.0",
+  "description": "Simple api that echos the first value from path, the message query string value, or a default message. A health endpoint is at /health and /404 or /fail returns a 404.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "start:debug": "DEBUG=* node --inspect-brk=9229 app.js",
+    "test": "mocha --colors --exit --recursive ./tests",
+    "test:ci": "mocha --exit --reporter mocha-junit-reporter --recursive ./tests",
+    "lint": "eslint . --ext .js",
+    "lint:ci": "eslint --format junit --output-file lint.xml . --ext .js"
+  },
+  "keywords": [],
+  "author": "Tyla Boff",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.1",
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "chai": "^4.3.6",
+    "eslint": "^8.22.0",
+    "eslint-plugin-mocha": "^10.1.0",
+    "mocha": "^10.0.0",
+    "mocha-junit-reporter": "^2.0.2",
+    "supertest": "^6.2.4"
+  }
+}
