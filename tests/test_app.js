@@ -1,13 +1,13 @@
 /**
- * Load test dependencies
+ * Load test dependencies.
  */
-// Randomize port before requirements for all tests
+// Randomize port before requirements for all tests.
 process.env.ADDRESS = "127.0.0.1";
 process.env.PORT = (Math.floor(Math.random() * 60000) + 1024);
 process.env.MUTE_LOGGER = "true";
 process.env.MESSAGE = "Testing";
 
-// Load dependencies
+// Load dependencies.
 const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
@@ -15,7 +15,7 @@ const assert = require("assert");
 const app = require("../app");
 
 /**
- * Test routes
+ * Test routes.
  */
 let healthRoute = "/health";
 describe("/health", function() {
@@ -37,7 +37,7 @@ describe("/health", function() {
 });
 
 /**
- * Test error handling
+ * Test error handling.
  */
 let route404 = "/404";
 describe("error handling", function() {
